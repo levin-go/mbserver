@@ -76,15 +76,14 @@ SkipFrameError:
 func readTimeout(port serial.Port) (int, []byte, error){
 	var data []byte
 	lenth := 0
-	//retimes := 0
-	timeoutTimes := 0
+	timeout := 0
 	for {
 		datat := make([]byte, 512)
 		n, err := port.Read(datat)
 		if err != nil{
 			if err == serial.ErrTimeout{
-				timeoutTimes++
-				if timeoutTimes >= 3{
+				timeout++
+				if timeout >= 3{
 					return lenth,data, nil
 				}
 			}else{
@@ -92,7 +91,7 @@ func readTimeout(port serial.Port) (int, []byte, error){
 			}
 		}
 		if n > 0{
-			timeoutTimes = 0
+			timeout = 0
 			lenth+=n
 			data = append(data, datat[:n]...)
 		}
