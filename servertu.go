@@ -48,7 +48,13 @@ func (s *Server) acceptSerialRequests(port serial.Port) {
 
 			// Set the length of the packet to the number of read bytes.
 			packet := buffer[:bytesRead]
-
+			if len(packet) < 1 {
+				log.Printf("packet len error\n")
+				continue
+			}
+			if s.SlaveId != 0 && packet[0] != s.SlaveId {
+				continue // slave id not equal
+			}
 			frame, err := NewRTUFrame(packet)
 			if err != nil {
 				log.Printf("bad serial frame error %v\n", err)

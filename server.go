@@ -23,6 +23,7 @@ type Server struct {
 	Coils            []byte
 	HoldingRegisters []uint16
 	InputRegisters   []uint16
+	SlaveId 		 byte
 	config 			 Config
 }
 
@@ -40,9 +41,10 @@ type Config struct {
 }
 
 // NewServer creates a new Modbus server (slave).
-func NewServer(config Config) *Server {
+func NewServer(config Config, slaveId byte) *Server {
 	s := &Server{}
 	s.config = config
+	s.SlaveId = slaveId
 	// Allocate Modbus memory maps.
 	s.DiscreteInputs = make([]byte, config.DiscreteInputs)
 	s.Coils = make([]byte, config.Coils)
