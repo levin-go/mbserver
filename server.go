@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/goburrow/serial"
 )
@@ -24,6 +25,7 @@ type Server struct {
 	HoldingRegisters []uint16
 	InputRegisters   []uint16
 	SlaveId 		 byte
+	ResponseDelay    time.Duration  //ms
 	config 			 Config
 }
 
@@ -41,10 +43,11 @@ type Config struct {
 }
 
 // NewServer creates a new Modbus server (slave).
-func NewServer(config Config, slaveId byte) *Server {
+func NewServer(config Config, slaveId byte, responseDelay int) *Server {
 	s := &Server{}
 	s.config = config
 	s.SlaveId = slaveId
+	s.ResponseDelay = time.Duration(responseDelay)
 	// Allocate Modbus memory maps.
 	s.DiscreteInputs = make([]byte, config.DiscreteInputs)
 	s.Coils = make([]byte, config.Coils)

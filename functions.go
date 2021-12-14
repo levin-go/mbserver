@@ -2,6 +2,7 @@ package mbserver
 
 import (
 	"encoding/binary"
+	"time"
 )
 
 // ReadCoils function 1, reads coils from internal memory.
@@ -21,6 +22,9 @@ func ReadCoils(s *Server, frame Framer) ([]byte, *Exception) {
 			shift := uint(i) % 8
 			data[1+i/8] |= byte(1 << shift)
 		}
+	}
+	if s.ResponseDelay > 0 {
+		time.Sleep(time.Millisecond * s.ResponseDelay)
 	}
 	return data, &Success
 }
@@ -43,6 +47,9 @@ func ReadDiscreteInputs(s *Server, frame Framer) ([]byte, *Exception) {
 			data[1+i/8] |= byte(1 << shift)
 		}
 	}
+	if s.ResponseDelay > 0 {
+		time.Sleep(time.Millisecond * s.ResponseDelay)
+	}
 	return data, &Success
 }
 
@@ -52,6 +59,9 @@ func ReadHoldingRegisters(s *Server, frame Framer) ([]byte, *Exception) {
 	if endRegister > s.config.Holding {
 		return []byte{}, &IllegalDataAddress
 	}
+	if s.ResponseDelay > 0 {
+		time.Sleep(time.Millisecond * s.ResponseDelay)
+	}
 	return append([]byte{byte(numRegs * 2)}, Uint16ToBytes(s.HoldingRegisters[register:endRegister])...), &Success
 }
 
@@ -60,6 +70,9 @@ func ReadInputRegisters(s *Server, frame Framer) ([]byte, *Exception) {
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
 	if endRegister > s.config.Input {
 		return []byte{}, &IllegalDataAddress
+	}
+	if s.ResponseDelay > 0 {
+		time.Sleep(time.Millisecond * s.ResponseDelay)
 	}
 	return append([]byte{byte(numRegs * 2)}, Uint16ToBytes(s.InputRegisters[register:endRegister])...), &Success
 }
@@ -72,6 +85,9 @@ func WriteSingleCoil(s *Server, frame Framer) ([]byte, *Exception) {
 		value = 1
 	}
 	s.Coils[register] = byte(value)
+	if s.ResponseDelay > 0 {
+		time.Sleep(time.Millisecond * s.ResponseDelay)
+	}
 	return frame.GetData()[0:4], &Success
 }
 
@@ -79,6 +95,9 @@ func WriteSingleCoil(s *Server, frame Framer) ([]byte, *Exception) {
 func WriteHoldingRegister(s *Server, frame Framer) ([]byte, *Exception) {
 	register, value := registerAddressAndValue(frame)
 	s.HoldingRegisters[register] = value
+	if s.ResponseDelay > 0 {
+		time.Sleep(time.Millisecond * s.ResponseDelay)
+	}
 	return frame.GetData()[0:4], &Success
 }
 
@@ -109,7 +128,9 @@ func WriteMultipleCoils(s *Server, frame Framer) ([]byte, *Exception) {
 			break
 		}
 	}
-
+	if s.ResponseDelay > 0 {
+		time.Sleep(time.Millisecond * s.ResponseDelay)
+	}
 	return frame.GetData()[0:4], &Success
 }
 
@@ -133,7 +154,9 @@ func WriteHoldingRegisters(s *Server, frame Framer) ([]byte, *Exception) {
 	} else {
 		exception = &IllegalDataAddress
 	}
-
+	if s.ResponseDelay > 0 {
+		time.Sleep(time.Millisecond * s.ResponseDelay)
+	}
 	return data, exception
 }
 
