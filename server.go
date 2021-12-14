@@ -23,6 +23,7 @@ type Server struct {
 	Coils            []byte
 	HoldingRegisters []uint16
 	InputRegisters   []uint16
+	config 			 Config
 }
 
 // Request contains the connection and Modbus frame.
@@ -41,7 +42,7 @@ type Config struct {
 // NewServer creates a new Modbus server (slave).
 func NewServer(config Config) *Server {
 	s := &Server{}
-
+	s.config = config
 	// Allocate Modbus memory maps.
 	s.DiscreteInputs = make([]byte, config.DiscreteInputs)
 	s.Coils = make([]byte, config.Coils)
