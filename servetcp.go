@@ -40,7 +40,11 @@ func (s *Server) accept(listen net.Listener) error {
 				}
 				// Set the length of the packet to the number of read bytes.
 				packet = packet[:bytesRead]
-				if s.SlaveId != 0 && packet[0] != s.SlaveId {
+				if len(packet) < 7 {
+					log.Printf("packet len error\n")
+					continue
+				}
+				if s.SlaveId != 0 && packet[6] != s.SlaveId {
 					continue // slave id not equal
 				}
 				frame, err := NewTCPFrame(packet)
