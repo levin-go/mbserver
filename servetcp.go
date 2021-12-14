@@ -1,7 +1,6 @@
 package mbserver
 
 import (
-	"errors"
 	"io"
 	"log"
 	"net"
@@ -20,11 +19,13 @@ func (s *Server) accept(listen net.Listener) error {
 		}
 		ips := strings.Split(conn.RemoteAddr().String(), ".")
 		if len(ips) < 1 {
-			return errors.New("unknown remote address")
+			log.Printf("unknown remote address")
+			continue
 		}
 		if ips[0] == "10" {
 			log.Printf("Unable to accept vpn connections: %s\n", conn.RemoteAddr().String())
-			return errors.New("unable to accept vpn connection")
+			//return errors.New("unable to accept vpn connection")
+			continue
 		}
 		go func(conn net.Conn) {
 			defer conn.Close()
