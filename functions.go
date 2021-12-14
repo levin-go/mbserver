@@ -7,6 +7,7 @@ import (
 
 // ReadCoils function 1, reads coils from internal memory.
 func ReadCoils(s *Server, frame Framer) ([]byte, *Exception) {
+	s.ReadTimes++
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
 	if endRegister > s.config.Coils {
 		return []byte{}, &IllegalDataAddress
@@ -26,11 +27,13 @@ func ReadCoils(s *Server, frame Framer) ([]byte, *Exception) {
 	if s.ResponseDelay > 0 {
 		time.Sleep(time.Millisecond * s.ResponseDelay)
 	}
+	s.LastComTime = time.Now()
 	return data, &Success
 }
 
 // ReadDiscreteInputs function 2, reads discrete inputs from internal memory.
 func ReadDiscreteInputs(s *Server, frame Framer) ([]byte, *Exception) {
+	s.ReadTimes++
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
 	if endRegister > s.config.DiscreteInputs {
 		return []byte{}, &IllegalDataAddress
@@ -47,62 +50,62 @@ func ReadDiscreteInputs(s *Server, frame Framer) ([]byte, *Exception) {
 			data[1+i/8] |= byte(1 << shift)
 		}
 	}
-	if s.ResponseDelay > 0 {
-		time.Sleep(time.Millisecond * s.ResponseDelay)
-	}
+	time.Sleep(time.Millisecond * s.ResponseDelay)
+	s.LastComTime = time.Now()
 	return data, &Success
 }
 
 // ReadHoldingRegisters function 3, reads holding registers from internal memory.
 func ReadHoldingRegisters(s *Server, frame Framer) ([]byte, *Exception) {
+	s.ReadTimes++
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
 	if endRegister > s.config.Holding {
 		return []byte{}, &IllegalDataAddress
 	}
-	if s.ResponseDelay > 0 {
-		time.Sleep(time.Millisecond * s.ResponseDelay)
-	}
+	time.Sleep(time.Millisecond * s.ResponseDelay)
+	s.LastComTime = time.Now()
 	return append([]byte{byte(numRegs * 2)}, Uint16ToBytes(s.HoldingRegisters[register:endRegister])...), &Success
 }
 
 // ReadInputRegisters function 4, reads input registers from internal memory.
 func ReadInputRegisters(s *Server, frame Framer) ([]byte, *Exception) {
+	s.ReadTimes++
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
 	if endRegister > s.config.Input {
 		return []byte{}, &IllegalDataAddress
 	}
-	if s.ResponseDelay > 0 {
-		time.Sleep(time.Millisecond * s.ResponseDelay)
-	}
+	s.LastComTime = time.Now()
+	time.Sleep(time.Millisecond * s.ResponseDelay)
 	return append([]byte{byte(numRegs * 2)}, Uint16ToBytes(s.InputRegisters[register:endRegister])...), &Success
 }
 
 // WriteSingleCoil function 5, write a coil to internal memory.
 func WriteSingleCoil(s *Server, frame Framer) ([]byte, *Exception) {
+	s.WriteTimes++
 	register, value := registerAddressAndValue(frame)
 	// TODO Should we use 0 for off and 65,280 (FF00 in hexadecimal) for on?
 	if value != 0 {
 		value = 1
 	}
 	s.Coils[register] = byte(value)
-	if s.ResponseDelay > 0 {
-		time.Sleep(time.Millisecond * s.ResponseDelay)
-	}
+	s.LastComTime = time.Now()
+	time.Sleep(time.Millisecond * s.ResponseDelay)
 	return frame.GetData()[0:4], &Success
 }
 
 // WriteHoldingRegister function 6, write a holding register to internal memory.
 func WriteHoldingRegister(s *Server, frame Framer) ([]byte, *Exception) {
+	s.WriteTimes++
 	register, value := registerAddressAndValue(frame)
 	s.HoldingRegisters[register] = value
-	if s.ResponseDelay > 0 {
-		time.Sleep(time.Millisecond * s.ResponseDelay)
-	}
+	s.LastComTime = time.Now()
+	time.Sleep(time.Millisecond * s.ResponseDelay)
 	return frame.GetData()[0:4], &Success
 }
 
 // WriteMultipleCoils function 15, writes holding registers to internal memory.
 func WriteMultipleCoils(s *Server, frame Framer) ([]byte, *Exception) {
+	s.WriteTimes++
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
 	valueBytes := frame.GetData()[5:]
 
@@ -128,14 +131,14 @@ func WriteMultipleCoils(s *Server, frame Framer) ([]byte, *Exception) {
 			break
 		}
 	}
-	if s.ResponseDelay > 0 {
-		time.Sleep(time.Millisecond * s.ResponseDelay)
-	}
+	time.Sleep(time.Millisecond * s.ResponseDelay)
+	s.LastComTime = time.Now()
 	return frame.GetData()[0:4], &Success
 }
 
 // WriteHoldingRegisters function 16, writes holding registers to internal memory.
 func WriteHoldingRegisters(s *Server, frame Framer) ([]byte, *Exception) {
+	s.WriteTimes++
 	register, numRegs, _ := registerAddressAndNumber(frame)
 	valueBytes := frame.GetData()[5:]
 	var exception *Exception
@@ -154,9 +157,8 @@ func WriteHoldingRegisters(s *Server, frame Framer) ([]byte, *Exception) {
 	} else {
 		exception = &IllegalDataAddress
 	}
-	if s.ResponseDelay > 0 {
-		time.Sleep(time.Millisecond * s.ResponseDelay)
-	}
+	s.LastComTime = time.Now()
+	time.Sleep(time.Millisecond * s.ResponseDelay)
 	return data, exception
 }
 

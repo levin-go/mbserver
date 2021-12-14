@@ -26,6 +26,9 @@ type Server struct {
 	InputRegisters   []uint16
 	SlaveId 		 byte
 	ResponseDelay    time.Duration  //ms
+	ReadTimes        uint32
+	WriteTimes       uint32
+	LastComTime      time.Time
 	config 			 Config
 }
 
