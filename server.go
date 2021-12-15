@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/goburrow/serial"
+	"github.com/styfstr/serial"
 )
 
 // Server is a Modbus slave with allocated memory for discrete inputs, coils, etc.
