@@ -9,7 +9,7 @@ import (
 func ReadCoils(s *Server, frame Framer) ([]byte, *Exception) {
 	s.ReadTimes++
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
-	if endRegister > s.config.Coils {
+	if endRegister > s.Config.Coils {
 		return []byte{}, &IllegalDataAddress
 	}
 	dataSize := numRegs / 8
@@ -35,7 +35,7 @@ func ReadCoils(s *Server, frame Framer) ([]byte, *Exception) {
 func ReadDiscreteInputs(s *Server, frame Framer) ([]byte, *Exception) {
 	s.ReadTimes++
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
-	if endRegister > s.config.DiscreteInputs {
+	if endRegister > s.Config.DiscreteInputs {
 		return []byte{}, &IllegalDataAddress
 	}
 	dataSize := numRegs / 8
@@ -59,7 +59,7 @@ func ReadDiscreteInputs(s *Server, frame Framer) ([]byte, *Exception) {
 func ReadHoldingRegisters(s *Server, frame Framer) ([]byte, *Exception) {
 	s.ReadTimes++
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
-	if endRegister > s.config.Holding {
+	if endRegister > s.Config.Holding {
 		return []byte{}, &IllegalDataAddress
 	}
 	time.Sleep(time.Millisecond * s.ResponseDelay)
@@ -71,7 +71,7 @@ func ReadHoldingRegisters(s *Server, frame Framer) ([]byte, *Exception) {
 func ReadInputRegisters(s *Server, frame Framer) ([]byte, *Exception) {
 	s.ReadTimes++
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
-	if endRegister > s.config.Input {
+	if endRegister > s.Config.Input {
 		return []byte{}, &IllegalDataAddress
 	}
 	s.LastComTime = time.Now()

@@ -29,7 +29,7 @@ type Server struct {
 	ReadTimes        uint32
 	WriteTimes       uint32
 	LastComTime      time.Time
-	config 			 Config
+	Config 			 Config
 }
 
 // Request contains the connection and Modbus frame.
@@ -48,7 +48,7 @@ type Config struct {
 // NewServer creates a new Modbus server (slave).
 func NewServer(config Config, slaveId byte, responseDelay int) *Server {
 	s := &Server{}
-	s.config = config
+	s.Config = config
 	s.SlaveId = slaveId
 	s.ResponseDelay = time.Duration(responseDelay)
 	// Allocate Modbus memory maps.
