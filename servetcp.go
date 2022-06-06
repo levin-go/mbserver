@@ -22,11 +22,11 @@ func (s *Server) accept(listen net.Listener) error {
 			log.Printf("unknown remote address")
 			continue
 		}
-		if ips[0] == "10" {
+		/*if ips[0] == "10" {
 			log.Printf("Unable to accept vpn connections: %s\n", conn.RemoteAddr().String())
 			//return errors.New("unable to accept vpn connection")
 			continue
-		}
+		}*/
 		go func(conn net.Conn) {
 			defer conn.Close()
 
